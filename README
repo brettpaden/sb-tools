@@ -1,0 +1,60 @@
+sb-tools provides functionality for managing your sandbox.  Right now the toolset is relatively simple.
+
+To install, do a git checkout of this repo in your home directory
+
+cd
+git clone git://github.com/brettpaden/sb-tools.git
+
+To use, add the following lines to your .bash_profile:
+
+PATH=$PATH:$HOME/bin:$HOME/sb-tools/bin
+RUBYLIB=$RUBYLIB:$HOME/sb-tools/lib
+PROJECT=fuckthat
+
+export PATH
+export RUBYLIB
+export PROJECT
+
+There are currently only two scripts:
+
+generate-apache-conf
+sb-deamons
+
+To generate an apache conf that will use passenger to deply your rails app (instead of the craptastic WEBbrtick):
+
+generate-apache-conf
+
+It will walk you through the values you need to enter or you can put them all on the command line.  See generate-apache-conf --help for details.  For example, my fuckthat project is in /u/paden/fuckthat.  I do:
+
+[paden@ip-10-124-111-237 ~]$ generate-apache-conf 
+user name (paden): 
+project (fuckthat): 
+rails app in project: core
+port: 10010
+port 10010 not available: address is already in use.
+Try again: 10011
+socket 10011 is available ... building config
+New apache config file available here:
+  /u/paden/apache/fuckthat.conf
+
+Note it makes sure I'm not using a port already in use.
+
+You could also have done:
+
+[paden@ip-10-124-111-237 ~]$ generate-apache-conf --railsapp core -P 10010 --project fuckthat --user paden
+socket 10010 is available ... building config
+New apache config file available here:
+  /u/paden/apache/fuckthat.conf
+
+To start your new apache instance:
+
+sb-deamons start
+
+To stop
+
+sb-deamons stop
+
+To restart 
+
+sb-deamons restart
+

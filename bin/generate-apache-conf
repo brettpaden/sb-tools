@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+#--------------------------------------------------------------------------------
+# Script that takes a template file, inserts values passed during a short stdin 
+# interactive sessions, then outputs a compelted template.  Template variables
+# are defined by __ALLCAPS__.  This is basically a big gay wrapper for a regex.
+#
+
+require 'optparse'   # for options parsing
+require 'socket'     # for testing your port
+require 'sbutils.rb' # shared sandbox libs
+
+options = {}
+options[:srcdir] = '';
+
+sbutils = SBUtils.new
+
+#--------------------------------------------------------------------------------
+# Command line option parsing ... YEAH!
+#
+optparse = OptionParser.new do |opts|
+	opts.banner = "This script will generate an apache passenger config file for you"
+	opts.on('-u', '--user USER', 'user account to store templates under') do|value| options[:user] =value end
+	opts.on('-p', '--project PROJECT', 'project for template file (i.e. "fuckthat")') do|value| options[:project] = value end
+	opts.on('-a', '--railsapp APP', 'directory of rails app found under project') do|value| options[:railsapp] = value end
+	opts.on('-P', '--port PORT', 'port to use for apache instance') do|value| options[:port] = value end
+	opts.on('-s', '--source DIR', 'source directory in your home directory') do|value| options[:source] = value end
+	opts.on('-h', '--help', 'display this screen') do 
+	    puts opts 
+		exit 
+	end
+end
+optparse.parse!   # actually parse the options as defined
+
+# start collecting input from the user
+config = {}
+config['USER']     = sbutils.parse_stdin("user name",            ENV['USER'],     options[:user])
+config['PROJECT']  = sbutils.parse_stdin("project",              ENV['PROJECT'],  options[:project])
+config['RAILSAPP'] = sbutils.parse_stdin("rails app in project", ENV['RAILSAPP'], options[:railsapp])
+config['PORT']     = sbutils.parse_stdin("port",                 ENV['PORT'],     options[:port])
+config['SRC']      = sbutils.parse_stdin("source directory",     ENV['SRCDIR'],   options[:srcdir])
+
+# make sure the port is available
+while true do 
+	error_type = 'address is already in use'
+	begin
+		socket = TCPSocket.new 'localhost', config['PORT']
+	rescue Errno::ECONNREFUSED
+		puts "socket #{config['PORT']} is available ... building config"
+		break
+	rescue Exception => e
+	     error_type = e.message
+	end
+	config['PORT'] = sbutils.parse_stdin("port #{config['PORT']} not available: #{error_type}.\nTry again", nil, nil)
+end
+
+# generate the location of our template file and output files
+template_file = sbutils.user_root + '/' + config['USER'] + '/' + config['SRC'] + '/' + config['PROJECT'] + '/apache/dev-template.conf'
+
+# test to see if the template file exists
+if not Kernel.test('e', template_file) then
+	puts "Could not find template file #{template_file}.  Check your arguments"
+	exit
+end
+
+# grab location of output file
+output_file_location = sbutils.apache_conf_file(config['USER'], config['PROJECT'])
+# get a file handle
+output_file = File.open(output_file_location, 'w');
+
+# open template, iterate over and sub out values
+File.open(template_file, 'r') do |file_handle|  
+	while line = file_handle.gets
+	line.gsub!(/__([A-Z_]*?)__/) do |variable|
+	    variable = config[$1]
+	end
+	output_file.puts line
+  end  
+end  
+
+# And we are done
+puts "New apache config file available here:\n  #{output_file_location}"

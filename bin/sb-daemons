@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+#--------------------------------------------------------------------------------
+# Fires up the deamons needed for a given project
+
+require 'optparse'   # for options parsing
+require 'sbutils.rb' # shared sandbox libs
+
+options = {}
+sbutils = SBUtils.new
+
+options[:action] = ARGV.shift
+puts options[:action]
+
+# only one real option to possibley glean, which is the PROJECT
+#
+optparse = OptionParser.new do |opts|
+	opts.banner = "sb-deamons stop|start|restart [-p PROJECT]"
+	opts.on('-p', '--project PROJECT', 'project for template file (i.e. "fuckthat")') do|value| options[:project] = value end
+	opts.on('-h', '--help', 'display this screen') do 
+	    puts opts 
+		exit 
+	end
+end
+optparse.parse!   # actually parse the options as defined
+
+# make sure there is a project defined
+options[:project] ||= ENV['PROJECT']
+if options[:project] == nil then
+	puts "No project defined.  Please set the PROJECT environment variable or specifiy one on the command line with -p"
+	exit
+end
+
+# grab the configuration files; we'll need them for stopping and or starting
+@apache_conf_file = sbutils.apache_conf_file(ENV['USER'], options[:project])
+@apache_pid_file = sbutils.apache_pid_file(ENV['USER'], options[:project])
+
+def start
+    command = "httpd -f #{@apache_conf_file}"
+    puts "Starting apache with: #{command}"
+    system command
+end
+def stop
+    command = "kill `cat #{@apache_pid_file}`"
+	puts "Stopping apache with: #{command}"
+	system command
+end
+def restart
+    stop
+	sleep 1
+	start
+end
+
+case 
+    when options[:action] == 'start'    then start
+	when options[:action] == 'stop'     then stop
+	when options[:action] == 'restart'  then restart
+end
+
+
+
+	    
+
+
+

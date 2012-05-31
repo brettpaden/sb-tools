@@ -37,7 +37,7 @@ config['USER']     = sbutils.parse_stdin("user name",            ENV['USER'],   
 config['PROJECT']  = sbutils.parse_stdin("project",              ENV['PROJECT'],  options[:project])
 config['RAILSAPP'] = sbutils.parse_stdin("rails app in project", ENV['RAILSAPP'], options[:railsapp])
 config['PORT']     = sbutils.parse_stdin("port",                 ENV['PORT'],     options[:port])
-config['SRC']      = sbutils.parse_stdin("source directory",     ENV['SRCDIR'],   options[:srcdir])
+config['SRC']      = sbutils.parse_stdin("source directory",     ENV['SRCDIR'],   options[:source])
 
 # make sure the port is available
 while true do 
@@ -63,7 +63,7 @@ if not Kernel.test('e', template_file) then
 end
 
 # grab location of output file
-output_file_location = sbutils.apache_conf_file(config['USER'], config['PROJECT'])
+output_file_location = sbutils.apache_conf_file(config['USER'], config['PROJECT'] + "_" + config['RAILSAPP'])
 # get a file handle
 output_file = File.open(output_file_location, 'w');
 

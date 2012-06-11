@@ -54,7 +54,7 @@ while true do
 end
 
 # generate the location of our template file and output files
-template_file = sbutils.user_root + '/' + config['USER'] + '/' + config['SRC'] + '/' + config['PROJECT'] + '/apache/dev-template.conf'
+template_file = sbutils.user_root + '/' + config['USER'] + '/' + config['SRC'] + '/' + config['PROJECT'] + '/apache/dev-template-' + config['RAILSAPP'] + '.conf'
 
 # test to see if the template file exists
 if not Kernel.test('e', template_file) then

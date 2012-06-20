@@ -22,33 +22,21 @@ sb-deamons
 
 To generate an apache conf that will use passenger to deply your rails app (instead of the craptastic WEBbrtick):
 
-generate-apache-conf
-
-It will walk you through the values you need to enter or you can put them all on the command line.  See generate-apache-conf --help for details.  For example, my fuckthat project is in /u/paden/fuckthat.  I do:
-
-[paden@ip-10-124-111-237 ~]$ generate-apache-conf 
-user name (paden): 
-project (fuckthat): 
-rails app in project: core
-port: 10010
-port 10010 not available: address is already in use.
-Try again: 10011
-socket 10011 is available ... building config
-New apache config file available here:
-  /u/paden/apache/fuckthat.conf
-
-Note it makes sure I'm not using a port already in use.
-
-You could also have done:
-
-[paden@ip-10-124-111-237 ~]$ generate-apache-conf --railsapp core -P 10010 --project fuckthat --user paden
+generate-apache-conf --railsapp web -P 10010 --project fuckthat --user paden
+source directory (src): 
+optional api server (http://localhost:10011): 
 socket 10010 is available ... building config
 New apache config file available here:
-  /u/paden/apache/fuckthat.conf
+  /u/paden/apache/fuckthat_web.conf
 
-To start your new apache instance:
+generate-apache-conf --railsapp core -P 10011 --project fuckthat --user paden
+source directory (src): 
+optional api server (http://localhost:10012): 
+socket 10011 is available ... building config
+New apache config file available here:
+  /u/paden/apache/fuckthat_core.conf
 
-sb-deamons start
+sb-daemons start
 
 To stop
 

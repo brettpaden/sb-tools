@@ -41,15 +41,33 @@ class SBUtils
 		return output_file_location
 	end
 
+
+    #--------------------------------------------------------------------------------
+	def apache_conf_files_for_project(user=ENV['USER'], project=ENV['PROJECT'])
+    #--------------------------------------------------------------------------------
+	# returns a list of all apache conf files associated with this project
+		output_root = user_root + '/' + user + '/apache'
+		return Dir[output_root + '/' + project + '_*.conf']
+	end
+
     #--------------------------------------------------------------------------------
 	def apache_pid_file(user=ENV['USER'], project=ENV['PROJECT'])
     #--------------------------------------------------------------------------------
 	# As the name implies, returns the path of the apache pid file.  Also generates
 	# directory structure for housing it automagically
-		output_root = user_root + '/' + user + '/apache/pids';
+		output_root = user_root + '/' + user + '/apache/pids'
 		FileUtils.mkdir_p output_root
 		output_file_location = output_root + '/' + project + '.pid'
 		return output_file_location
 	end
+
+    #--------------------------------------------------------------------------------
+	def apache_pid_files_for_project(user=ENV['USER'], project=ENV['PROJECT'])
+    #--------------------------------------------------------------------------------
+	# returns a list of all pid files associated with apaches running under this project
+		output_root = user_root + '/' + user + '/apache/pids'
+		return Dir[output_root + '/' + project + '-*.pid']
+	end
+
 
 end

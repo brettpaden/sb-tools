@@ -24,6 +24,7 @@ optparse = OptionParser.new do |opts|
 	opts.on('-a', '--railsapp APP', 'directory of rails app found under project') do|value| options[:railsapp] = value end
 	opts.on('-P', '--port PORT', 'port to use for apache instance') do|value| options[:port] = value end
 	opts.on('-s', '--source DIR', 'source directory in your home directory') do|value| options[:source] = value end
+	opts.on('-A', '--apiserver SERVER', 'if web client, need to specify apiserver') do|value| options[:apiserver] = value end
 	opts.on('-h', '--help', 'display this screen') do 
 	    puts opts 
 		exit 
@@ -31,13 +32,18 @@ optparse = OptionParser.new do |opts|
 end
 optparse.parse!   # actually parse the options as defined
 
+
 # start collecting input from the user
 config = {}
-config['USER']     = sbutils.parse_stdin("user name",            ENV['USER'],     options[:user])
-config['PROJECT']  = sbutils.parse_stdin("project",              ENV['PROJECT'],  options[:project])
-config['RAILSAPP'] = sbutils.parse_stdin("rails app in project", ENV['RAILSAPP'], options[:railsapp])
-config['PORT']     = sbutils.parse_stdin("port",                 ENV['PORT'],     options[:port])
-config['SRC']      = sbutils.parse_stdin("source directory",     ENV['SRCDIR'],   options[:source])
+config['USER']     = sbutils.parse_stdin("user name",                 ENV['USER'],     options[:user])
+config['PROJECT']  = sbutils.parse_stdin("project",                   ENV['PROJECT'],  options[:project])
+config['RAILSAPP'] = sbutils.parse_stdin("rails app in project",      ENV['RAILSAPP'], options[:railsapp])
+config['PORT']     = sbutils.parse_stdin("port",                      ENV['PORT'],     options[:port])
+config['SRC']      = sbutils.parse_stdin("source directory",          'src',           options[:source])
+
+default_api_server_port = Integer(config['PORT']) + 1
+default_api_server = "http://localhost:#{default_api_server_port}"
+config['APISERVER']  = sbutils.parse_stdin("optional api server", default_api_server,  options[:appport])
 
 # make sure the port is available
 while true do 

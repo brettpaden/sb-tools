@@ -31,18 +31,22 @@ if options[:project] == nil then
 end
 
 # grab the configuration files; we'll need them for stopping and or starting
-@apache_conf_file = sbutils.apache_conf_file(ENV['USER'], options[:project])
-@apache_pid_file = sbutils.apache_pid_file(ENV['USER'], options[:project])
+@apache_conf_files_for_project = sbutils.apache_conf_files_for_project(ENV['USER'], options[:project])
+@apache_pid_files_for_project  = sbutils.apache_pid_files_for_project(ENV['USER'], options[:project])
 
 def start
-    command = "httpd -f #{@apache_conf_file}"
-    puts "Starting apache with: #{command}"
-    system command
+    @apache_conf_files_for_project.each { |file|
+        command = "httpd -f #{file}"
+        puts "Starting apache with: #{command}"
+        system command
+	}
 end
 def stop
-    command = "kill `cat #{@apache_pid_file}`"
-	puts "Stopping apache with: #{command}"
-	system command
+	@apache_pid_files_for_project.each { |file|
+		command = "kill `cat #{file}`"
+		puts "Stopping apache with: #{command}"
+		system command
+	}
 end
 def restart
     stop

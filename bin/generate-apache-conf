@@ -7,7 +7,7 @@
 
 require 'optparse'   # for options parsing
 require 'socket'     # for testing your port
-require 'sbutils.rb' # shared sandbox libs
+require './sbutils.rb' # shared sandbox libs
 
 options = {}
 options[:srcdir] = '';
@@ -83,5 +83,12 @@ File.open(template_file, 'r') do |file_handle|
   end  
 end  
 
+# make sure the apache log and apache pid directories exist
+# note that these two functions have side-effects
+pid_file = sbutils.apache_pid_file(config['USER'], config['PROJECT'])
+log_dir = sbutils.apache_log_dir(config['USER'])
+
 # And we are done
-puts "New apache config file available here:\n  #{output_file_location}"
+puts "New apache config file available here:\n  #{output_file_location}\n\n"
+puts "Apache pids will be in:\n  #{pid_file}\n\n"
+puts "Apache logs will be in:\n  #{log_dir}\n\n"

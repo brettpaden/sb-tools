@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+#--------------------------------------------------------------------------------
+# Script that takes a template file, inserts values passed during a short stdin 
+# interactive sessions, then outputs a compelted template.  Template variables
+# are defined by __ALLCAPS__.  This is basically a big gay wrapper for a regex.
+#
+
+require 'optparse'   # for options parsing
+require 'sbutils.rb' # shared sandbox libs
+
+options = {}
+options[:mysql_dir] = "#{ENV['SRCTOP']}/#{ENV['PROJECT']}/mysql"
+sbutils = SBUtils.new
+
+#--------------------------------------------------------------------------------
+# Command line option parsing ... YEAH!
+#
+optparse = OptionParser.new do |opts|
+	opts.banner = "This script will install mysql for your project"
+	opts.on('-d', '--dir DIR', "location to install mysql; defaults to #{options[:mysql_dir]}") do|value| options[:mysql_dir] =value end
+	opts.on('-h', '--help', 'display this screen') do 
+	    puts opts 
+		exit 
+	end
+end
+optparse.parse!   # actually parse the options as defined
+
+
+# start collecting input from the user
+config = {}
+config['MYSQL_DIR'] = sbutils.parse_stdin("install directory", options[:mysql_dir], options[:mysql_dir]);
+
+# generate the location of our template file and output files
+template_file = config['MYSQL_DIR'] + '/my_cnf.template'
+
+# test to see if the template file exists
+if not Kernel.test('e', template_file) then
+	puts "Could not find template file #{template_file}.  Check your arguments"
+	exit
+end
+
+# grab location of output file
+output_file_location = config['MYSQL_DIR'] + '/my.cnf'
+# get a file handle
+output_file = File.open(output_file_location, 'w');
+
+# open template, iterate over and sub out values
+File.open(template_file, 'r') do |file_handle|  
+	while line = file_handle.gets
+	line.gsub!(/__([A-Z_]*?)__/) do |variable|
+	    variable = config[$1]
+	end
+	output_file.puts line
+  end  
+end  
+
+# tell the user where the new file is 
+#puts "New mysql config file available here:\n  #{output_file_location}"
+system "mkdir -p #{options[:mysql_dir]}/data"
+
+puts "For reasons beyond my comprehension, running the following commands from within ruby doing the system\n";
+puts "call fail.  Please cut and past and run by hand to finish your installation\n\n"
+
+# now install the database
+command = "mysql_install_db --defaults-file=#{output_file_location};\\"
+#puts "Installing default mysql database\n  #{command} "
+puts command
+
+
+# start the database
+command = "sb-mysql start; sleep 3;\\"
+#puts "Starting mysql\n  #{command}"
+#system command
+puts command
+
+# set up database with reasonable permissions
+#puts "Generating database and setting up permissions\n";
+command = "mysql -S #{config['MYSQL_DIR']}/socket -uroot --password='' -e \"create database #{ENV['PROJECT']}; grant all on  #{ENV['PROJECT']}.* to #{ENV['MYSQL_USER']}@localhost identified by '#{ENV['MYSQL_PWD']}'; flush privileges\";\\"
+#system command
+puts command
+
+# run rake
+command = "rake -f #{ENV['SRCTOP']}/#{ENV['PROJECT']}/core/Rakefile db:migrate;"
+#puts "Running db:migrate\n  #{command}"
+#system command
+puts command
+
+#puts("Done")

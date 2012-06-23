@@ -10,15 +10,22 @@ To use, add the following lines to your .bash_profile:
 PATH=$PATH:$HOME/bin:$HOME/sb-tools/bin
 RUBYLIB=$RUBYLIB:$HOME/sb-tools/lib
 PROJECT=fuckthat
+MYSQL_USER=web
+MYSQL_PWD=devpass
 
 export PATH
 export RUBYLIB
 export PROJECT
+export MYSQL_USER
+export MYSQL_PWD
 
-There are currently only two scripts:
+To generate a mysql installation make sure you have sourced in .bash_profile, then run
 
-generate-apache-conf
-sb-deamons
+generate-mysql
+
+To stop and start the databae:
+
+sb-mysql stop|start|restart
 
 To generate an apache conf that will use passenger to deply your rails app (instead of the craptastic WEBbrtick):
 

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+MYSQL_DIR=$SRCTOP/$PROJECT/mysql
+
+mkdir -p $MYSQL_DIR
+ 
+case "$1" in
+     start)
+         [ -e $MYSQL_DIR/my.cnf ] || exit;
+         mysqld_safe --defaults-file=$MYSQL_DIR/my.cnf &> $MYSQL_DIR/init.log &
+         ;;
+     stop)
+         pidfile=$MYSQL_DIR/pid
+         [ -e "$pidfile" ] && \
+             mysqladmin -S $MYSQL_DIR/socket -uroot --password='' shutdown &> $MYSQL_DIR/init.log &
+         ;;
+     *)
+         mysql -S $MYSQL_DIR/socket -uweb $*
+         ;;
+ esac
+

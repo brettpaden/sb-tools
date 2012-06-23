@@ -40,7 +40,7 @@ def start
         puts "Starting apache with: #{command}"
         system command
 	}
-	system sb-mysql start
+	system "sb-mysql start"
 end
 def stop
 	@apache_pid_files_for_project.each { |file|
@@ -48,7 +48,7 @@ def stop
 		puts "Stopping apache with: #{command}"
 		system command
 	}
-	system sb-mysql stop
+	system "sb-mysql stop"
 end
 def restart
     stop

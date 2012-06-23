@@ -10,12 +10,14 @@ To use, add the following lines to your .bash_profile:
 PATH=$PATH:$HOME/bin:$HOME/sb-tools/bin
 RUBYLIB=$RUBYLIB:$HOME/sb-tools/lib
 PROJECT=fuckthat
+SRCTOP=$HOME/src
 MYSQL_USER=web
 MYSQL_PWD=devpass
 
 export PATH
 export RUBYLIB
 export PROJECT
+export SRCTOP
 export MYSQL_USER
 export MYSQL_PWD
 

@@ -69,5 +69,15 @@ class SBUtils
 		return Dir[output_root + '/' + project + '-*.pid']
 	end
 
+    #--------------------------------------------------------------------------------
+	def apache_log_dir(user=ENV['USER'])
+    #--------------------------------------------------------------------------------
+	# As the name implies, returns the path of the apache log files.  Also generates
+	# directory if it does not exist
+		output_root = user_root + '/' + user + '/apache/logs'
+		FileUtils.mkdir_p output_root
+		return output_root
+	end
+
 
 end

@@ -52,7 +52,7 @@ def stop
 end
 def restart
     stop
-	sleep 1
+	sleep 5
 	start
 end
 
